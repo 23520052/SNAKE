@@ -13,6 +13,15 @@ public:
     Point& operator=(const Point &p);
 };
 
+Point& Point::operator=(const Point &p)
+{
+    if(this != &p) {
+        this->x = p.x;
+        this->y = p.y;
+    }
+    return *this; 
+}
+
 class Node{
 private:
     Point coordinates;
@@ -35,6 +44,24 @@ public:
     inline char getAppearance(){return this->appearance;} // return current appearance of wall
     inline void setAppearance(char app); // set all of node's appearance in blocks vector
 };
+
+Wall:Wall(int x, int y, int width, int height, char appearance) : appearance(appearance){
+    for(int i = 0; i < height; ++i)
+    {
+        for(int j = 0; j < width; ++j)
+        {
+            Node block(x + j, y + i);
+            block.setAppearance(appearance);
+            blocks.push_back(block);
+        }
+    }
+}
+
+void Wall::setAppearance(char app)
+{
+    this->appearance = app;
+    for (auto& block : blocks){ block.setAppearance(app);}
+}
 
 class Food{
 private:
@@ -71,8 +98,31 @@ public:
     bool foodCollision(Food food); // check if the snake and a specific peice of food overlap each other
 };
 
+void Snake::upsize(int noNodes)
+{
+    for (int i = 0; i < noNodes; ++i){body.push_back(head);} // thêm đầu vào thân     
+}
 
+void Snake::downsize(int noNodes)
+{
+    for(int i = 0; i < noNodes && !body.empty(); ++i){ body.pop_back();} // loại bỏ phần đuôi     
+}
 
+bool Snake::wallCollision(Wall wall)
+{
+    for (const auto& block : wall.Blocks())
+    {
+        if (head.Coordinates().getX() == block.Coordinates().getX() && 
+            head.Coordinates().getY() == block.Coordinates().getY()) return true;
+    }
+    return false;
+}
+
+bool Snake::foodCollision(Food food)
+{
+    return head.Coordinates().getX() == food.getFood().Coordinates().getX() &&
+           head.Coordinates().getY() == food.getFood().Coordinates().getY();
+}
 
 
 
