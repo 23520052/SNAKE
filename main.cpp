@@ -139,9 +139,10 @@ void UpdateGame()
 }
 
 // Function to set the game difficulty level
-int SetDifficulty()
+int SetDifficultyLevel()
 {
-    int dfc, choice;
+    int dfc;
+    char choice;
     cout << "\nSET DIFFICULTY\n1: Easy\n2: Medium\n3: hard "
             "\nNOTE: if not chosen or pressed any other "
             "key, the difficulty will be automatically set "
@@ -149,16 +150,16 @@ int SetDifficulty()
     cin >> choice;
     switch (choice) {
     case '1':
-        dfc = 50;
+        dfc = 150; // for easy 
         break;
     case '2':
-        dfc = 100;
+        dfc = 100; // medium 
         break;
     case '3':
-        dfc = 150;
+        dfc = 50; // higher for hard 
         break;
     default:
-        dfc = 100;
+        dfc = 100; // default to medium 
     }
     return dfc;
 }
@@ -168,34 +169,36 @@ void UserInput()
 {
     // Checks if a key is pressed or not
     if (_kbhit()) {
-        // Getting the pressed key
-        switch (_getch()) {
-        case 'a':
-            sDir = LEFT;
-            break;
-        case 'd':
-            sDir = RIGHT;
-            break;
-        case 'w':
-            sDir = UP;
-            break;
-        case 's':
-            sDir = DOWN;
-            break;
-        case 'x':
-            isGameOver = true;
-            break;
-        }
+        int key == _getch();
+        if (key == 224){ // 224 cho phím mũi tên 
+            key = _getch(); // lấy mã tiếp theo để xđ hướng 
+            // Getting the pressed key
+            switch (key) {
+                case 75: // left 
+                    if (sDir != RIGHT) sDir = LEFT;
+                    break;
+                case 77: // right 
+                    if (sDir != LEFT) sDir = RIGHT;
+                    break;
+                case 72: // up 
+                    if (sDir != DOWN) sDir = UP;
+                    break;
+                case 80: // down 
+                    if (sDir != UP) sDir = DOWN;
+                    break;
+            }
+        } else if (key == 'x') isGameOver = true;    
     }
 }
 
 // Main function / game looping function
 int main()
 {
+    srand(time(0)); // seed for random number generation 
     string playerName;
     cout << "enter your name: ";
     cin >> playerName;
-    int dfc = SetDifficulty();
+    int dfc = SetDifficultyLevel();
 
     GameInit();
     while (!isGameOver) {
@@ -206,6 +209,7 @@ int main()
         // difficulty
         Sleep(dfc);
     }
-
+    system("cls");
+    cout << "Game Over!" << playerName << "'s final score: " << playerScore << endl;
     return 0;
 }
