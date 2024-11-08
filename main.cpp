@@ -40,13 +40,22 @@ void HideCursor()
 void GameInit()
 {
     isGameOver = false;
-    sDir = STOP;
+    sDir = RIGHT;
     x = width / 2;
     y = height / 2;
     fruitCordX = rand() % width;
     fruitCordY = rand() % height;
     playerScore = 0;
     HideCursor(); // Ẩn con trỏ nháy
+
+    // Khởi tạo chiều dài ban đầu của rắn
+    snakeTailLen = 2; // Độ dài ban đầu của rắn (bao gồm cả đầu)
+    
+    // Khởi tạo vị trí phần thân ban đầu
+    snakeTailX[0] = x - 1;
+    snakeTailY[0] = y;
+    snakeTailX[1] = x - 2;
+    snakeTailY[1] = y;
 }
 
 void GoToXY(int x, int y) {
@@ -63,17 +72,17 @@ void GameRender(string playerName)
 
     // Creating top walls with '-'
     for (int i = 0; i < width + 2; i++)
-        cout << "-";
+        cout << "=";
     cout << endl;
 
     for (int i = 0; i < height; i++) {
         for (int j = 0; j <= width; j++) {
             // Creating side walls with '|'
             if (j == 0 || j == width)
-                cout << "|";
+                cout << "+";
             // Creating snake's head with 'O'
             if (i == y && j == x)
-                cout << "O";
+                cout << ":";
             // Creating the sanke's food with '#'
             else if (i == fruitCordY && j == fruitCordX)
                 cout << "#";
@@ -96,7 +105,7 @@ void GameRender(string playerName)
 
     // Creating bottom walls with '-'
     for (int i = 0; i < width + 2; i++)
-        cout << "-";
+        cout << "=";
     cout << endl;
 
     // Display player's score
@@ -162,9 +171,7 @@ int SetDifficultyLevel()
     int dfc;
     char choice;
     cout << "\nSET DIFFICULTY\n1: Easy\n2: Medium\n3: hard "
-            "\nNOTE: if not chosen or pressed any other "
-            "key, the difficulty will be automatically set "
-            "to medium\nChoose difficulty level: ";
+    "\nNOTE: if not chosen or pressed any other key, the difficulty will be automatically\n     set to medium \nChoose difficulty level: ";
     cin >> choice;
     switch (choice) {
     case '1':
@@ -187,7 +194,7 @@ void UserInput()
 {
     // Checks if a key is pressed or not
     if (_kbhit()) {
-        int key == _getch();
+        int key = _getch();
         if (key == 224){ // 224 cho phím mũi tên 
             key = _getch(); // lấy mã tiếp theo để xđ hướng 
             // Getting the pressed key
