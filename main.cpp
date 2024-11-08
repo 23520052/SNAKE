@@ -26,6 +26,16 @@ snakesDirection sDir;
 // boolean variable for checking game is over or not
 bool isGameOver;
 
+// Hàm ẩn con trỏ nháy trong console
+void HideCursor()
+{
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_CURSOR_INFO cursorInfo;
+    GetConsoleCursorInfo(hConsole, &cursorInfo);
+    cursorInfo.bVisible = false; // Ẩn con trỏ
+    SetConsoleCursorInfo(hConsole, &cursorInfo);
+}
+
 // Function to initialize game variables
 void GameInit()
 {
@@ -36,12 +46,20 @@ void GameInit()
     fruitCordX = rand() % width;
     fruitCordY = rand() % height;
     playerScore = 0;
+    HideCursor(); // Ẩn con trỏ nháy
+}
+
+void GoToXY(int x, int y) {
+    COORD coord;
+    coord.X = x;
+    coord.Y = y;
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
 // Function for creating the game board & rendering
 void GameRender(string playerName)
 {
-    system("cls"); // Clear the console
+    GoToXY(0, 0);
 
     // Creating top walls with '-'
     for (int i = 0; i < width + 2; i++)
