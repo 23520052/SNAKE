@@ -11,6 +11,7 @@ public:
     inline void setX(int newX){this->x = newX;}
     inline void setY(int newY){this->y = newY;}
     Point& operator=(const Point &p);
+    bool operator==(Point p) {return this->x == p.getX() && this->y == p.getY();}
 };
 
 Point& Point::operator=(const Point &p)
@@ -28,7 +29,7 @@ private:
     char appearance;
 public:
     inline Node(int coordinateX = 0, int coordinateY = 0){coordinates.setX(coordinateX); coordinates.setY(coordinateY); appearance =  ' ';}
-    inline Point& Coordinates(){return this->coordinates;}
+    inline Point Coordinates(){return this->coordinates;}
     inline char getAppearance(){return this->appearance;}
     inline void setAppearance(char app){this->appearance = app;}
     inline ~Node(){}
@@ -45,7 +46,7 @@ public:
     inline void setAppearance(char app); // set all of node's appearance in blocks vector
 };
 
-Wall:Wall(int x, int y, int width, int height, char appearance) : appearance(appearance){
+Wall::Wall(int x, int y, int width, int height, char appearance) : appearance(appearance){
     for(int i = 0; i < height; ++i)
     {
         for(int j = 0; j < width; ++j)
@@ -110,18 +111,16 @@ void Snake::downsize(int noNodes)
 
 bool Snake::wallCollision(Wall wall)
 {
-    for (const auto& block : wall.Blocks())
+    for (Node block : wall.Blocks())
     {
-        if (head.Coordinates().getX() == block.Coordinates().getX() && 
-            head.Coordinates().getY() == block.Coordinates().getY()) return true;
+        if (head.Coordinates() == block.Coordinates()) return true;
     }
     return false;
 }
 
 bool Snake::foodCollision(Food food)
 {
-    return head.Coordinates().getX() == food.getFood().Coordinates().getX() &&
-           head.Coordinates().getY() == food.getFood().Coordinates().getY();
+    return head.Coordinates() == food.getFood().Coordinates();
 }
 
 
