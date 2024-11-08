@@ -2,6 +2,7 @@
 #include <conio.h>
 #include <iostream>
 #include <windows.h>
+#include "game_con_ran.h"
 using namespace std;
 
 // height and width of the boundary
@@ -70,23 +71,23 @@ void GameRender(string playerName)
 {
     GoToXY(0, 0);
 
-    // Creating top walls with '-'
+    // Creating top walls with '='
     for (int i = 0; i < width + 2; i++)
         cout << "=";
     cout << endl;
 
     for (int i = 0; i < height; i++) {
         for (int j = 0; j <= width; j++) {
-            // Creating side walls with '|'
+            // Creating side walls with '+'
             if (j == 0 || j == width)
                 cout << "+";
-            // Creating snake's head with 'O'
+            // Creating snake's head with ':'
             if (i == y && j == x)
                 cout << ":";
             // Creating the sanke's food with '#'
             else if (i == fruitCordY && j == fruitCordX)
                 cout << "#";
-            // Creating snake's head with 'O'
+
             else {
                 bool prTail = false;
                 for (int k = 0; k < snakeTailLen; k++) {
@@ -103,7 +104,7 @@ void GameRender(string playerName)
         cout << endl;
     }
 
-    // Creating bottom walls with '-'
+    // Creating bottom walls with '='
     for (int i = 0; i < width + 2; i++)
         cout << "=";
     cout << endl;
@@ -232,7 +233,10 @@ int main()
         UpdateGame();
         // creating a delay for according to the chosen
         // difficulty
-        Sleep(dfc);
+        if (sDir == UP || sDir == DOWN)
+            Sleep(dfc * 1.5);
+        else 
+            Sleep(dfc);
     }
     system("cls");
     cout << "Game Over!" << playerName << "'s final score: " << playerScore << endl;
