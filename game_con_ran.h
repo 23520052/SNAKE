@@ -28,7 +28,7 @@ private:
     Point food;
 public:
     inline Food() {}
-    inline Food(int x, int y) { food.setX(x); food.setY(y);}
+    inline Food(int x, int y) { food.setX(x); food.setY(y); }
     inline Point& getFood() { return this->food; }
 };
 
@@ -101,7 +101,12 @@ void Snake::downsize(int noNodes)
 
 bool Snake::foodCollision(Food food)
 {
-    return head == food.getFood();
+    if (head == food.getFood())
+    {
+        body.push_back(Point(getTail().getX(), getTail().getY()));
+        return true;
+    }
+    return false;
 }
 
 
