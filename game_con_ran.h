@@ -23,56 +23,15 @@ Point& Point::operator=(const Point &p)
     return *this; 
 }
 
-class Node{
-private:
-    Point coordinates;
-    char appearance;
-public:
-    inline Node(int coordinateX = 0, int coordinateY = 0){coordinates.setX(coordinateX); coordinates.setY(coordinateY); appearance =  ' ';}
-    inline Point Coordinates(){return this->coordinates;}
-    inline char getAppearance(){return this->appearance;}
-    inline void setAppearance(char app){this->appearance = app;}
-    inline ~Node(){}
-};
-
-class Wall{
-private:
-    std::vector<Node> blocks;
-    char appearance;
-public:
-    Wall(int x, int y, int width, int height, char appearance);
-    inline std::vector<Node>& Blocks(){return this->blocks;}
-    inline char getAppearance(){return this->appearance;} // return current appearance of wall
-    inline void setAppearance(char app); // set all of node's appearance in blocks vector
-};
-
-Wall::Wall(int x, int y, int width, int height, char appearance) : appearance(appearance){
-    for(int i = 0; i < height; ++i)
-    {
-        for(int j = 0; j < width; ++j)
-        {
-            Node block(x + j, y + i);
-            block.setAppearance(appearance);
-            blocks.push_back(block);
-        }
-    }
-}
-
-void Wall::setAppearance(char app)
-{
-    this->appearance = app;
-    for (auto& block : blocks){ block.setAppearance(app);}
-}
-
 class Food{
 private:
-    Node food;
+    Point food;
     char appearance;
 public:
-    inline Food(int x, int y, char __appearance){food.Coordinates().setX(x); food.Coordinates().setY(y); appearance = __appearance;}
-    inline Node& getFood(){return this->food;}
+    inline Food(int x, int y, char __appearance){food.setX(x); food.setY(y); appearance = __appearance;}
+    inline Point& getFood(){return this->food;}
     inline char getAppearance(){return this->appearance;}
-    inline void setAppearance(char app){this->appearance = app; food.setAppearance(appearance);}
+    inline void setAppearance(char app){this->appearance = app;}
 };
 
 enum SnakeDirection{
@@ -84,18 +43,17 @@ enum SnakeDirection{
 
 class Snake{
 private:
-    Node head;
-    std::vector<Node> body;
+    Point head;
+    std::vector<Point> body;
     SnakeDirection direction;
 public:
-    inline Node& getHead(){return this->head;}
-    inline Node& getTail(){return this->body.back();}
-    inline std::vector<Node>& getBody(){return this->body;}
+    inline Point& getHead(){return this->head;}
+    inline Point& getTail(){return this->body.back();}
+    inline std::vector<Point>& getBody(){return this->body;}
     inline SnakeDirection& getDirection(){return this->direction;}
     inline void setDirection(const SnakeDirection newDir){this->direction = newDir;} // get current snake's direction
     void upsize(int noNodes); // Increase snake's size, remove 'noNodes' nodes from tail
     void downsize(int noNodes); // Decrease snake's size, add more 'noNodes' nodes to tail
-    bool wallCollision(Wall wall); //check if the snake and a specific wall overlap each other;
     bool foodCollision(Food food); // check if the snake and a specific peice of food overlap each other
 };
 
@@ -109,18 +67,10 @@ void Snake::downsize(int noNodes)
     for(int i = 0; i < noNodes && !body.empty(); ++i){ body.pop_back();} // loại bỏ phần đuôi     
 }
 
-bool Snake::wallCollision(Wall wall)
-{
-    for (Node block : wall.Blocks())
-    {
-        if (head.Coordinates() == block.Coordinates()) return true;
-    }
-    return false;
-}
 
 bool Snake::foodCollision(Food food)
 {
-    return head.Coordinates() == food.getFood().Coordinates();
+    return head == food.getFood();
 }
 
 
