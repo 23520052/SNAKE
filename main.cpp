@@ -2,6 +2,8 @@
 #include <conio.h>
 #include <iostream>
 #include <windows.h>
+#include <ctime>
+#include <cstdlib>
 #include "game_con_ran.h"
 using namespace std;
 
@@ -10,20 +12,14 @@ const int width = 80;
 const int height = 20;
 
 // Snake head coordinates of snake (x-axis, y-axis)
-int x, y;
+Snake snake(width / 2, height / 2);
 // Food coordinates
-int fruitCordX, fruitCordY;
+Food food;
 // variable to store the score of he player
 int playerScore;
-// Array to store the coordinates of snake tail (x-axis,
-// y-axis)
-int snakeTailX[100], snakeTailY[100];
 // variable to store the length of the sanke's tail
 int snakeTailLen;
 // for storing snake's moving snakesDirection
-enum snakesDirection { STOP = 0, LEFT, RIGHT, UP, DOWN };
-// snakesDirection variable
-snakesDirection sDir;
 // boolean variable for checking game is over or not
 bool isGameOver;
 
@@ -41,22 +37,10 @@ void HideCursor()
 void GameInit()
 {
     isGameOver = false;
-    sDir = RIGHT;
-    x = width / 2;
-    y = height / 2;
-    fruitCordX = rand() % width;
-    fruitCordY = rand() % height;
+    food = Food(rand() % width, rand() % height);
     playerScore = 0;
     HideCursor(); // Ẩn con trỏ nháy
-
-    // Khởi tạo chiều dài ban đầu của rắn
-    snakeTailLen = 2; // Độ dài ban đầu của rắn (bao gồm cả đầu)
-    
-    // Khởi tạo vị trí phần thân ban đầu
-    snakeTailX[0] = x - 1;
-    snakeTailY[0] = y;
-    snakeTailX[1] = x - 2;
-    snakeTailY[1] = y;
+    snakeTailLen = snake.getBody().size(); // Độ dài đuôi ban đầu của rắn 
 }
 
 void GoToXY(int x, int y) {
@@ -82,17 +66,16 @@ void GameRender(string playerName)
             if (j == 0 || j == width)
                 cout << "+";
             // Creating snake's head with ':'
-            if (i == y && j == x)
+            if (snake.getHead() == Point(j, i))
                 cout << ":";
             // Creating the sanke's food with '#'
-            else if (i == fruitCordY && j == fruitCordX)
+            else if (food.getFood() == Point(j, i))
                 cout << "#";
 
             else {
                 bool prTail = false;
                 for (int k = 0; k < snakeTailLen; k++) {
-                    if (snakeTailX[k] == j
-                        && snakeTailY[k] == i) {
+                    if (snake.getBody()[k] == Point(j, i)) {
                         cout << "o";
                         prTail = true;
                     }
@@ -111,58 +94,28 @@ void GameRender(string playerName)
 
     // Display player's score
     cout << playerName << "'s Score: " << playerScore
-         << endl;
+        << endl;
 }
 
 // Function for updating the game state
 void UpdateGame()
 {
-    int prevX = snakeTailX[0];
-    int prevY = snakeTailY[0];
-    int prev2X, prev2Y;
-    snakeTailX[0] = x;
-    snakeTailY[0] = y;
-
-    for (int i = 1; i < snakeTailLen; i++) {
-        prev2X = snakeTailX[i];
-        prev2Y = snakeTailY[i];
-        snakeTailX[i] = prevX;
-        snakeTailY[i] = prevY;
-        prevX = prev2X;
-        prevY = prev2Y;
-    }
-
-    switch (sDir) {
-    case LEFT:
-        x--;
-        break;
-    case RIGHT:
-        x++;
-        break;
-    case UP:
-        y--;
-        break;
-    case DOWN:
-        y++;
-        break;
-    }
-
+    snakeTailLen = snake.getBody().size();
+    snake.move(snake.getDirection());
     // Checks for snake's collision with the wall (|)
-    if (x >= width || x < 0 || y >= height || y < 0)
+    if (snake.getHead().getX() >= width || snake.getHead().getX() < 0 || snake.getHead().getY() >= height || snake.getHead().getY() < 0)
         isGameOver = true;
 
     // Checks for collision with the tail (o)
     for (int i = 0; i < snakeTailLen; i++) {
-        if (snakeTailX[i] == x && snakeTailY[i] == y)
+        if (snake.getBody()[i] == snake.getHead())
             isGameOver = true;
     }
 
     // Checks for snake's collision with the food (#)
-    if (x == fruitCordX && y == fruitCordY) {
+    if (snake.foodCollision(food)) {
         playerScore += 10;
-        fruitCordX = rand() % width;
-        fruitCordY = rand() % height;
-        snakeTailLen++;
+        food = Food(rand() % width, rand() % height);
     }
 }
 
@@ -172,7 +125,7 @@ int SetDifficultyLevel()
     int dfc;
     char choice;
     cout << "\nSET DIFFICULTY\n1: Easy\n2: Medium\n3: hard "
-    "\nNOTE: if not chosen or pressed any other key, the difficulty will be automatically\n     set to medium \nChoose difficulty level: ";
+        "\nNOTE: if not chosen or pressed any other key, the difficulty will be automatically\n     set to medium \nChoose difficulty level: ";
     cin >> choice;
     switch (choice) {
     case '1':
@@ -196,31 +149,32 @@ void UserInput()
     // Checks if a key is pressed or not
     if (_kbhit()) {
         int key = _getch();
-        if (key == 224){ // 224 cho phím mũi tên 
+        if (key == 224) { // 224 cho phím mũi tên 
             key = _getch(); // lấy mã tiếp theo để xđ hướng 
             // Getting the pressed key
             switch (key) {
-                case 75: // left 
-                    if (sDir != RIGHT) sDir = LEFT;
-                    break;
-                case 77: // right 
-                    if (sDir != LEFT) sDir = RIGHT;
-                    break;
-                case 72: // up 
-                    if (sDir != DOWN) sDir = UP;
-                    break;
-                case 80: // down 
-                    if (sDir != UP) sDir = DOWN;
-                    break;
+            case 75: // left 
+                if (snake.getDirection() != DirectionRight) snake.setDirection(DirectionLeft);
+                break;
+            case 77: // right 
+                if (snake.getDirection() != DirectionLeft) snake.setDirection(DirectionRight);
+                break;
+            case 72: // up 
+                if (snake.getDirection() != DirectionDown) snake.setDirection(DirectionUp);
+                break;
+            case 80: // down 
+                if (snake.getDirection() != DirectionUp) snake.setDirection(DirectionDown);
+                break;
             }
-        } else if (key == 'x') isGameOver = true;    
+        }
+        else if (key == 'x') isGameOver = true;
     }
 }
 
 // Main function / game looping function
 int main()
 {
-    srand(time(0)); // seed for random number generation 
+    srand(time(NULL)); // seed for random number generation 
     string playerName;
     cout << "enter your name: ";
     cin >> playerName;
@@ -233,9 +187,9 @@ int main()
         UpdateGame();
         // creating a delay for according to the chosen
         // difficulty
-        if (sDir == UP || sDir == DOWN)
+        if (snake.getDirection() == DirectionUp || snake.getDirection() == DirectionDown)
             Sleep(dfc * 1.5);
-        else 
+        else
             Sleep(dfc);
     }
     system("cls");
