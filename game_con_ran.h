@@ -47,9 +47,42 @@ private:
     std::vector<Point> body;
     SnakeDirection direction;
 public:
+    inline Snake() {}
+    inline Snake(int x, int y) { this->head = Point(x, y); body.push_back(Point(x - 1, y)); body.push_back(Point(x - 2, y)); direction = DirectionRight; }
     inline Point& getHead(){return this->head;}
     inline Point& getTail(){return this->body.back();}
     inline std::vector<Point>& getBody(){return this->body;}
+    inline std::vector<Point> move(SnakeDirection sDir)
+    {
+        int prevX = body[0].getX();
+        int prevY = body[0].getY();
+        int prev2X, prev2Y;
+        body[0].setX(head.getX());
+        body[0].setY(head.getY());
+        int len = body.size();
+        for (int i = 1; i < len; i++) {
+            prev2X = body[i].getX();
+            prev2Y = body[i].getY();
+            body[i].setX(prevX);
+            body[i].setY(prevY);
+            prevX = prev2X;
+            prevY = prev2Y;
+        }
+        switch (direction) {
+            case DirectionLeft:
+                head.setX(head.getX() - 1);
+                break;
+            case DirectionRight:
+                head.setX(head.getX() + 1);
+                break;
+            case DirectionUp:
+                head.setY(head.getY() - 1);
+                break;
+            case DirectionDown:
+                head.setY(head.getY() + 1);
+                break;
+        }
+    }
     inline SnakeDirection& getDirection(){return this->direction;}
     inline void setDirection(const SnakeDirection newDir){this->direction = newDir;} // get current snake's direction
     void upsize(int noNodes); // Increase snake's size, remove 'noNodes' nodes from tail
@@ -72,7 +105,7 @@ bool Snake::foodCollision(Food food)
 {
     return head == food.getFood();
 }
-
+    
 
 
 
