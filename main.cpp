@@ -54,7 +54,7 @@ void GoToXY(int x, int y) {
 void GameRender(string playerName)
 {
     GoToXY(0, 0);
-
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN);
     // Creating top walls with '='
     for (int i = 0; i < width + 2; i++)
         cout << "=";
@@ -63,19 +63,26 @@ void GameRender(string playerName)
     for (int i = 0; i < height; i++) {
         for (int j = 0; j <= width; j++) {
             // Creating side walls with '+'
-            if (j == 0 || j == width)
+            if (j == 0 || j == width) {
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN);
                 cout << "+";
+            }
             // Creating snake's head with ':'
-            if (snake.getHead() == Point(j, i))
-                cout << ":";
-            // Creating the sanke's food with '#'
-            else if (food.getFood() == Point(j, i))
-                cout << "#";
+            if (snake.getHead() == Point(j, i)) {
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_GREEN);
+                cout << "O";
+            }
 
+            // Creating the sanke's food with '#'
+            else if (food.getFood() == Point(j, i)) {
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED);
+                cout << "#";
+            }
             else {
                 bool prTail = false;
                 for (int k = 0; k < snakeTailLen; k++) {
                     if (snake.getBody()[k] == Point(j, i)) {
+                        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_GREEN);
                         cout << "o";
                         prTail = true;
                     }
@@ -91,7 +98,7 @@ void GameRender(string playerName)
     for (int i = 0; i < width + 2; i++)
         cout << "=";
     cout << endl;
-
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE); // Default color
     // Display player's score
     cout << playerName << "'s Score: " << playerScore
         << endl;
