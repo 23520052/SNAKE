@@ -57,29 +57,27 @@ void GoToXY(int x, int y)
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
-void generateFood() 
+void generateFood()
 {
-	// Initialize a random position for food
-	food = Food(rand() % width + 1, rand() % height + 1);
+	bool check = false;  // Variable to check if the food position is valid
 
-	// Ensure the food position does not overlap with the snake's head
-	while (snake.getHead() == food.getFood())
-	{
-		food = Food(rand() % width + 1, rand() % height + 1);
-	}
-	bool check = false; // if check = true, regenerate 
-	do 
-	{
-		// Check if the food overlaps with any part of the snake's body
-		for (int i = 0; i < snakeTailLen; ++i)
-		{
+	// Loop until a valid position is found
+	while (!check) {
+		food = Food(rand() % width + 1, rand() % height + 1);  // Generate a random food
+
+		// Check if food overlaps with the snake's head
+		if (snake.getHead() == food.getFood()) {
+			continue;  // If it overlaps, generate new food
+		}
+
+		check = true;  // Assume the position is valid
+		for (int i = 0; i < snakeTailLen; ++i) {
 			if (snake.getBody()[i] == food.getFood()) {
-				check = true;
-				food = Food(rand() % width + 1, rand() % height + 1);
+				check = false;  // If it overlaps with the snake's body, it's invalid
 				break;
 			}
 		}
-	} while (check);
+	}
 }
 
 // Function to initialize game
