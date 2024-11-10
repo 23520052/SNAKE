@@ -33,6 +33,12 @@ void HideCursor()
     SetConsoleCursorInfo(hConsole, &cursorInfo);
 }
 
+void setConsoleBackgroundColor(int r, int g, int b, std::string str) 
+{
+    std::cout << "\033[48;2;" << r << ";" << g << ";" << b << "m"; 
+    std::cout << str;
+}
+
 // Function to initialize game variables
 void GameInit()
 {
@@ -43,7 +49,8 @@ void GameInit()
     snakeTailLen = snake.getBody().size(); // Độ dài đuôi ban đầu của rắn 
 }
 
-void GoToXY(int x, int y) {
+void GoToXY(int x, int y) 
+{
     COORD coord;
     coord.X = x;
     coord.Y = y;
@@ -54,52 +61,52 @@ void GoToXY(int x, int y) {
 void GameRender(string playerName)
 {
     GoToXY(0, 0);
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN);
     // Creating top walls with '='
     for (int i = 0; i < width + 2; i++)
-        cout << "=";
+        setConsoleBackgroundColor(79, 79, 79, " ");
     cout << endl;
 
     for (int i = 0; i < height; i++) {
         for (int j = 0; j <= width; j++) {
-            // Creating side walls with '+'
+            // Creating side walls
             if (j == 0 || j == width) {
-                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN);
-                cout << "+";
+                setConsoleBackgroundColor(79, 79, 79, " ");
             }
-            // Creating snake's head with ':'
+            // Creating snake's head
             if (snake.getHead() == Point(j, i)) {
-                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_GREEN);
-                cout << "O";
+                setConsoleBackgroundColor(105, 105, 105, " ");
             }
 
             // Creating the sanke's food with '#'
             else if (food.getFood() == Point(j, i)) {
-                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED);
-                cout << "#";
+                setConsoleBackgroundColor(255, 69, 0, " ");
             }
             else {
                 bool prTail = false;
                 for (int k = 0; k < snakeTailLen; k++) {
                     if (snake.getBody()[k] == Point(j, i)) {
-                        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_GREEN);
-                        cout << "o";
+                        setConsoleBackgroundColor(0, 0, 0, " ");
                         prTail = true;
                     }
                 }
-                if (!prTail)
-                    cout << " ";
+                if (!prTail && j != width)
+                {
+                        setConsoleBackgroundColor(0, 139, 0, " ");
+                }
             }
         }
         cout << endl;
+
     }
 
     // Creating bottom walls with '='
     for (int i = 0; i < width + 2; i++)
-        cout << "=";
+    {
+        setConsoleBackgroundColor(79, 79, 79, " ");
+    }
     cout << endl;
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE); // Default color
     // Display player's score
+    setConsoleBackgroundColor(0, 0, 0, "");
     cout << playerName << "'s Score: " << playerScore
         << endl;
 }
