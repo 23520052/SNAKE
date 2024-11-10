@@ -68,14 +68,14 @@ void GameRender(string playerName)
     GoToXY(0, 0);
     // Creating top walls with '='
     for (int i = 0; i < width + 2; i++)
-        setConsoleBackgroundColor(70, 130, 180, " ");
+        setConsoleBackgroundColor(0, 255, 255, " ");
     cout << endl;
 
     for (int i = 0; i < height; i++) {
         for (int j = 0; j <= width; j++) {
             // Creating side walls
             if (j == 0 || j == width) {
-                setConsoleBackgroundColor(70, 130, 180, " ");
+                setConsoleBackgroundColor(0, 255, 255, " ");
             }
             // Creating snake's head
             if (snake.getHead() == Point(j, i)) {
@@ -107,7 +107,7 @@ void GameRender(string playerName)
     // Creating bottom walls with '='
     for (int i = 0; i < width + 2; i++)
     {
-        setConsoleBackgroundColor(70, 130, 180, " ");
+        setConsoleBackgroundColor(0, 255, 255, " ");
     }
     cout << endl;
     // Display player's score
