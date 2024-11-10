@@ -145,8 +145,13 @@ int SetDifficultyLevel()
 {
     int dfc;
     char choice;
-    cout << "\nSET DIFFICULTY\n1: Easy\n2: Medium\n3: hard "
-        "\nNOTE: if not chosen or pressed any other key, the difficulty will be automatically\n     set to medium \nChoose difficulty level: ";
+    setTextColor(14);
+    cout << "\nSET DIFFICULTY\n1: Easy\n2 : Medium\n3 : hard ";
+    setTextColor(7);
+    cout << "\nNOTE: if not chosen or pressed any other key, the difficulty will be automatically\n     set to medium ";
+    setTextColor(10);
+    cout << "\nChoose difficulty level : ";
+    setTextColor(7);
     cin >> choice;
     switch (choice) {
     case '1':
@@ -201,23 +206,46 @@ int main()
     cout << "ENTER YOUR NAME: ";
     setTextColor(7);
     cin >> playerName;
-    int dfc = SetDifficultyLevel();
 
-    GameInit();
-    while (!isGameOver) {
-        GameRender(playerName);
-        UserInput();
-        UpdateGame();
-        // creating a delay for according to the chosen
-        // difficulty
-        if (snake.getDirection() == DirectionUp || snake.getDirection() == DirectionDown)
-            Sleep(dfc * 1.5);
+    do {
+        int dfc = SetDifficultyLevel();
+    
+        GameInit();
+        while (!isGameOver) {
+            GameRender(playerName);
+            UserInput();
+            UpdateGame();
+            // creating a delay for according to the chosen
+            // difficulty
+            if (snake.getDirection() == DirectionUp || snake.getDirection() == DirectionDown)
+                Sleep(dfc * 1.5);
+            else
+                Sleep(dfc);
+        }
+        
+        system("cls");
+        setTextColor(10);
+        cout << "Game Over!" << playerName << "'s final score: " << playerScore << endl;
+        setTextColor(7);
+
+        // Hiển thị menu lựa chọn
+        char choice;
+        setTextColor(14);
+        cout << "\nDo you want to play again? (Y/N): ";
+        setTextColor(7);
+        cin >> choice;
+        
+        if (choice == 'N' || choice == 'n')
+        {
+            isGameOver = true; // Đặt trạng thái game kết thúc nếu người chơi chọn thoát
+        }
         else
-            Sleep(dfc);
-    }
-    system("cls");
-    setTextColor(10);
-    cout << "Game Over!" << playerName << "'s final score: " << playerScore << endl;
-    setTextColor(7);
+        {
+            isGameOver = false;
+            playerScore = 0;
+            snake = Snake(width / 2, height / 2);
+            food = Food(rand() % width, rand() % height);
+        }
+    } while (!isGameOver); // nếu không kết thúc thì tiếp tục chơi lại 
     return 0;
 }
