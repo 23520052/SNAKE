@@ -26,6 +26,9 @@ int snakeTailLen;
 // boolean variable for checking game is over or not
 bool isGameOver;
 
+// Điểm tăng thêm khi ăn thức ăn, tùy thuộc vào độ khó
+int scoreIncrement;
+
 // Hàm ẩn con trỏ nháy trong console
 void HideCursor()
 {
@@ -146,7 +149,7 @@ void UpdateGame()
 
 	// Checks for snake's collision with the food (#)
 	if (snake.foodCollision(food)) {
-		playerScore += 10;
+		playerScore += scoreIncrement;
 		food = Food(rand() % width + 1, rand() % height + 1);
 		std::thread soundThread(playSoundAsync, 600, 500);  // Âm thanh khi rắn ăn thức ăn
 		soundThread.detach();
@@ -169,15 +172,19 @@ int SetDifficultyLevel()
 	switch (choice) {
 	case '1':
 		dfc = 150; // for easy 
+		scoreIncrement = 10; // Điểm tăng 10
 		break;
 	case '2':
 		dfc = 100; // medium 
+		scoreIncrement = 20; // Điểm tăng 20
 		break;
 	case '3':
 		dfc = 50; // higher for hard 
+		scoreIncrement = 30; // Điểm tăng 30
 		break;
 	default:
 		dfc = 100; // default to medium 
+		scoreIncrement = 20; // Điểm tăng 20
 	}
 	return dfc;
 }
