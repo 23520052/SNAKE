@@ -57,6 +57,31 @@ void GoToXY(int x, int y)
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
+void generateFood() 
+{
+	// Initialize a random position for food
+	food = Food(rand() % width + 1, rand() % height + 1);
+
+	// Ensure the food position does not overlap with the snake's head
+	while (snake.getHead() == food.getFood())
+	{
+		food = Food(rand() % width + 1, rand() % height + 1);
+	}
+	bool check = false; // if check = true, regenerate 
+	do 
+	{
+		// Check if the food overlaps with any part of the snake's body
+		for (int i = 0; i < snakeTailLen; ++i)
+		{
+			if (snake.getBody()[i] == food.getFood()) {
+				check = true;
+				food = Food(rand() % width + 1, rand() % height + 1);
+				break;
+			}
+		}
+	} while (check);
+}
+
 // Function to initialize game
 void GameInit()
 {
@@ -90,7 +115,7 @@ void GameInit()
 
 	snake = Snake(width / 2, height / 2);
 	isGameOver = false;
-	food = Food(rand() % width + 1, rand() % height + 1);
+	generateFood();
 	playerScore = 0;
 	snakeTailLen = snake.getBody().size(); // Độ dài đuôi ban đầu của rắn 
 }
@@ -150,7 +175,7 @@ void UpdateGame()
 	// Checks for snake's collision with the food (#)
 	if (snake.foodCollision(food)) {
 		playerScore += scoreIncrement;
-		food = Food(rand() % width + 1, rand() % height + 1);
+		generateFood();
 		std::thread soundThread(playSoundAsync, 600, 500);  // Âm thanh khi rắn ăn thức ăn
 		soundThread.detach();
 	}
@@ -162,7 +187,7 @@ int SetDifficultyLevel()
 	int dfc;
 	char choice;
 	setTextColor(14);
-	cout << "\nSET DIFFICULTY\n1: Easy\n2 : Medium\n3 : hard ";
+	cout << "\nSET DIFFICULTY\n1: Easy\n2: Medium\n3: Hard ";
 	setTextColor(7);
 	cout << "\nNOTE: if not chosen or pressed any other key, the difficulty will be automatically\n     set to medium ";
 	setTextColor(10);
@@ -268,7 +293,7 @@ int main()
 			isGameOver = false;
 			playerScore = 0;
 			snake = Snake(width / 2, height / 2);
-			food = Food(rand() % width, rand() % height);
+			generateFood();
 		}
 	} while (!isGameOver); // nếu không kết thúc thì tiếp tục chơi lại 
 	return 0;
