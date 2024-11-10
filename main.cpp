@@ -122,18 +122,25 @@ void UpdateGame()
 	snake.move(snake.getDirection());
 	// Checks for snake's collision with the wall (|)
 	if (snake.getHead().getX() > width || snake.getHead().getX() == 0 || snake.getHead().getY() > height || snake.getHead().getY() == 0)
+	{
 		isGameOver = true;
+		Beep(400, 500);  // Âm thanh khi rắn chết
+	}
 
 	// Checks for collision with the tail (o)
 	for (int i = 0; i < snakeTailLen; i++) {
 		if (snake.getBody()[i] == snake.getHead())
+		{
 			isGameOver = true;
+			Beep(400, 500);  // Âm thanh khi rắn chết
+		}
 	}
 
 	// Checks for snake's collision with the food (#)
 	if (snake.foodCollision(food)) {
 		playerScore += 10;
 		food = Food(rand() % width + 1, rand() % height + 1);
+		Beep(1200, 150);  // Âm thanh khi rắn ăn thức ăn
 	}
 }
 
