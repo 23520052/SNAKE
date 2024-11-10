@@ -54,7 +54,7 @@ void GameInit()
 	GoToXY(0, 0);
 	// Creating top walls
 	for (int i = 0; i < width + 2; i++)
-		setConsoleBackgroundColor(79, 79, 79, " ");
+		setConsoleBackgroundColor(0, 255, 255, " ");
 	cout << endl;
 
 	// Creating bottom walls
@@ -75,7 +75,7 @@ void GameInit()
 		for (int j = 1; j <= width; j++)
 		{
 			GoToXY(j, i);
-			setConsoleBackgroundColor(0, 139, 0, " ");
+			setConsoleBackgroundColor(0, 0, 0, " ");
 		}
 
 	snake = Snake(width / 2, height / 2);
@@ -86,26 +86,33 @@ void GameInit()
 	snakeTailLen = snake.getBody().size(); // Độ dài đuôi ban đầu của rắn 
 }
 
+void setTextColor(int color) // màu chữ 
+{
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+}
+
 // Function for creating snake
 void GameRender(string playerName)
 {
 	GoToXY(pre_snakeTail.getX(), pre_snakeTail.getY());
-	setConsoleBackgroundColor(0, 139, 0, " ");
+	setConsoleBackgroundColor(0, 0, 0, " ");
 
 	GoToXY(snake.getHead().getX(), snake.getHead().getY());
-	setConsoleBackgroundColor(105, 105, 105, " ");
+	setConsoleBackgroundColor(255, 0, 0, " ");
 
 	GoToXY(food.getFood().getX(), food.getFood().getY());
-	setConsoleBackgroundColor(255, 69, 0, " ");
+	setConsoleBackgroundColor(255, 255, 0, " ");
 	for (int k = 0; k < snakeTailLen; k++) {
 		GoToXY(snake.getBody()[k].getX(), snake.getBody()[k].getY());
-		setConsoleBackgroundColor(0, 0, 0, " ");
+		setConsoleBackgroundColor(255, 165, 0, " ");
 	}
 	cout << endl;
 	// Display player's score
 	GoToXY(0, height + 2);
 	setConsoleBackgroundColor(0, 0, 0, "");
+  setTextColor(10);
 	cout << playerName << "'s Score: " << playerScore << endl;
+  setTextColor(7);
 }
 
 // Function for updating the game state
@@ -135,8 +142,13 @@ int SetDifficultyLevel()
 {
 	int dfc;
 	char choice;
-	cout << "\nSET DIFFICULTY\n1: Easy\n2: Medium\n3: Hard "
-		"\nNOTE: if not chosen or pressed any other key, the difficulty will be automatically set to medium\nChoose difficulty level: ";
+	setTextColor(14);
+  cout << "\nSET DIFFICULTY\n1: Easy\n2 : Medium\n3 : hard ";
+  setTextColor(7);
+  cout << "\nNOTE: if not chosen or pressed any other key, the difficulty will be automatically\n     set to medium ";
+  setTextColor(10);
+  cout << "\nChoose difficulty level : ";
+  setTextColor(7);
 	cin >> choice;
 	switch (choice) {
 	case '1':
@@ -185,29 +197,56 @@ void UserInput()
 // Main function / game looping function
 int main()
 {
-	srand(time(NULL)); // seed for random number generation 
-	string playerName;
-	cout << "Enter your name: ";
-	cin >> playerName;
-	int dfc = SetDifficultyLevel();
-	system("cls");
-	GameRender(playerName);
-	GameInit();
-	while (!isGameOver) {
-		pre_snakeTail = snake.getTail();
-		UpdateGame();
-		if (isGameOver) break;
-		GameRender(playerName);
-		UserInput();
-		
-		// creating a delay for according to the chosen
-		// difficulty
-		if (snake.getDirection() == DirectionUp || snake.getDirection() == DirectionDown)
-			Sleep(dfc * 1.8);
-		else
-			Sleep(dfc);
-	}
-	system("cls");
-	cout << "Game Over!" << playerName << "'s final score: " << playerScore << endl;
-	return 0;
+    srand(time(NULL)); // seed for random number generation 
+    string playerName;
+    setTextColor(10);
+    cout << "ENTER YOUR NAME: ";
+    setTextColor(7);
+    cin >> playerName;
+
+    do {
+        int dfc = SetDifficultyLevel();
+    
+        GameInit();
+        while (!isGameOver) {
+          
+            pre_snakeTail = snake.getTail();
+            UpdateGame();
+            if (isGameOver) break;
+            GameRender(playerName);
+            UserInput();
+          
+            // creating a delay for according to the chosen
+            // difficulty
+            if (snake.getDirection() == DirectionUp || snake.getDirection() == DirectionDown)
+                Sleep(dfc * 1.5);
+            else
+                Sleep(dfc);
+        }
+        
+        system("cls");
+        setTextColor(10);
+        cout << "Game Over!" << playerName << "'s final score: " << playerScore << endl;
+        setTextColor(7);
+
+        // Hiển thị menu lựa chọn
+        char choice;
+        setTextColor(14);
+        cout << "\nDo you want to play again? (Y/N): ";
+        setTextColor(7);
+        cin >> choice;
+        
+        if (choice == 'N' || choice == 'n')
+        {
+            isGameOver = true; // Đặt trạng thái game kết thúc nếu người chơi chọn thoát
+        }
+        else
+        {
+            isGameOver = false;
+            playerScore = 0;
+            snake = Snake(width / 2, height / 2);
+            food = Food(rand() % width, rand() % height);
+        }
+    } while (!isGameOver); // nếu không kết thúc thì tiếp tục chơi lại 
+    return 0;
 }
