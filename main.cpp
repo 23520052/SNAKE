@@ -57,41 +57,46 @@ void GoToXY(int x, int y)
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
+void setTextColor(int color) // màu chữ 
+{
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+}
+
 // Function for creating the game board & rendering
 void GameRender(string playerName)
 {
     GoToXY(0, 0);
     // Creating top walls with '='
     for (int i = 0; i < width + 2; i++)
-        setConsoleBackgroundColor(79, 79, 79, " ");
+        setConsoleBackgroundColor(70, 130, 180, " ");
     cout << endl;
 
     for (int i = 0; i < height; i++) {
         for (int j = 0; j <= width; j++) {
             // Creating side walls
             if (j == 0 || j == width) {
-                setConsoleBackgroundColor(79, 79, 79, " ");
+                setConsoleBackgroundColor(70, 130, 180, " ");
             }
             // Creating snake's head
             if (snake.getHead() == Point(j, i)) {
-                setConsoleBackgroundColor(105, 105, 105, " ");
+                setConsoleBackgroundColor(255, 0, 0, " ");
             }
 
             // Creating the sanke's food with '#'
             else if (food.getFood() == Point(j, i)) {
-                setConsoleBackgroundColor(255, 69, 0, " ");
+                setConsoleBackgroundColor(255, 255, 0, " ");
             }
             else {
                 bool prTail = false;
                 for (int k = 0; k < snakeTailLen; k++) {
                     if (snake.getBody()[k] == Point(j, i)) {
-                        setConsoleBackgroundColor(0, 0, 0, " ");
+                        setConsoleBackgroundColor(255, 165, 0, " ");
                         prTail = true;
                     }
                 }
                 if (!prTail && j != width)
                 {
-                        setConsoleBackgroundColor(0, 139, 0, " ");
+                        setConsoleBackgroundColor(0, 0, 0, " ");
                 }
             }
         }
@@ -102,13 +107,15 @@ void GameRender(string playerName)
     // Creating bottom walls with '='
     for (int i = 0; i < width + 2; i++)
     {
-        setConsoleBackgroundColor(79, 79, 79, " ");
+        setConsoleBackgroundColor(70, 130, 180, " ");
     }
     cout << endl;
     // Display player's score
     setConsoleBackgroundColor(0, 0, 0, "");
+    setTextColor(10);
     cout << playerName << "'s Score: " << playerScore
         << endl;
+    setTextColor(7);
 }
 
 // Function for updating the game state
@@ -190,7 +197,9 @@ int main()
 {
     srand(time(NULL)); // seed for random number generation 
     string playerName;
-    cout << "enter your name: ";
+    setTextColor(10);
+    cout << "ENTER YOUR NAME: ";
+    setTextColor(7);
     cin >> playerName;
     int dfc = SetDifficultyLevel();
 
@@ -207,6 +216,8 @@ int main()
             Sleep(dfc);
     }
     system("cls");
+    setTextColor(10);
     cout << "Game Over!" << playerName << "'s final score: " << playerScore << endl;
+    setTextColor(7);
     return 0;
 }
