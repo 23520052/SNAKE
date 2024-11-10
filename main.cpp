@@ -5,6 +5,8 @@
 #include <ctime>
 #include <cstdlib>
 #include "game_con_ran.h"
+#include <thread>
+
 using namespace std;
 
 // height and width of the boundary
@@ -12,7 +14,7 @@ const int width = 80;
 const int height = 20;
 
 // Snake head coordinates of snake (x-axis, y-axis)
-Snake snake; 
+Snake snake;
 Point pre_snakeTail;
 // Food coordinates
 Food food;
@@ -40,6 +42,10 @@ void setConsoleBackgroundColor(int r, int g, int b, std::string str)
 	std::cout << str;
 }
 
+void playSoundAsync(int frequency, int duration) {
+	Beep(frequency, duration);  // Phát âm thanh
+}
+
 void GoToXY(int x, int y)
 {
 	COORD coord;
@@ -51,6 +57,7 @@ void GoToXY(int x, int y)
 // Function to initialize game
 void GameInit()
 {
+	HideCursor(); // Ẩn con trỏ nháy
 	GoToXY(0, 0);
 	// Creating top walls
 	for (int i = 0; i < width + 2; i++)
@@ -82,13 +89,12 @@ void GameInit()
 	isGameOver = false;
 	food = Food(rand() % width + 1, rand() % height + 1);
 	playerScore = 0;
-	HideCursor(); // Ẩn con trỏ nháy
 	snakeTailLen = snake.getBody().size(); // Độ dài đuôi ban đầu của rắn 
 }
 
 void setTextColor(int color) // màu chữ 
 {
-    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
 }
 
 // Function for creating snake
@@ -110,9 +116,9 @@ void GameRender(string playerName)
 	// Display player's score
 	GoToXY(0, height + 2);
 	setConsoleBackgroundColor(0, 0, 0, "");
-  setTextColor(10);
+	setTextColor(10);
 	cout << playerName << "'s Score: " << playerScore << endl;
-  setTextColor(7);
+	setTextColor(7);
 }
 
 // Function for updating the game state
@@ -124,7 +130,8 @@ void UpdateGame()
 	if (snake.getHead().getX() > width || snake.getHead().getX() == 0 || snake.getHead().getY() > height || snake.getHead().getY() == 0)
 	{
 		isGameOver = true;
-		Beep(400, 500);  // Âm thanh khi rắn chết
+		std::thread soundThread(playSoundAsync, 400, 500);  // Âm thanh khi rắn chết
+		soundThread.detach();
 	}
 
 	// Checks for collision with the tail (o)
@@ -132,7 +139,8 @@ void UpdateGame()
 		if (snake.getBody()[i] == snake.getHead())
 		{
 			isGameOver = true;
-			Beep(400, 500);  // Âm thanh khi rắn chết
+			std::thread soundThread(playSoundAsync, 400, 500);  // Âm thanh khi rắn chết
+			soundThread.detach();
 		}
 	}
 
@@ -140,7 +148,8 @@ void UpdateGame()
 	if (snake.foodCollision(food)) {
 		playerScore += 10;
 		food = Food(rand() % width + 1, rand() % height + 1);
-		Beep(1200, 150);  // Âm thanh khi rắn ăn thức ăn
+		std::thread soundThread(playSoundAsync, 600, 500);  // Âm thanh khi rắn ăn thức ăn
+		soundThread.detach();
 	}
 }
 
@@ -150,12 +159,12 @@ int SetDifficultyLevel()
 	int dfc;
 	char choice;
 	setTextColor(14);
-  cout << "\nSET DIFFICULTY\n1: Easy\n2 : Medium\n3 : hard ";
-  setTextColor(7);
-  cout << "\nNOTE: if not chosen or pressed any other key, the difficulty will be automatically\n     set to medium ";
-  setTextColor(10);
-  cout << "\nChoose difficulty level : ";
-  setTextColor(7);
+	cout << "\nSET DIFFICULTY\n1: Easy\n2 : Medium\n3 : hard ";
+	setTextColor(7);
+	cout << "\nNOTE: if not chosen or pressed any other key, the difficulty will be automatically\n     set to medium ";
+	setTextColor(10);
+	cout << "\nChoose difficulty level : ";
+	setTextColor(7);
 	cin >> choice;
 	switch (choice) {
 	case '1':
@@ -204,56 +213,56 @@ void UserInput()
 // Main function / game looping function
 int main()
 {
-    srand(time(NULL)); // seed for random number generation 
-    string playerName;
-    setTextColor(10);
-    cout << "ENTER YOUR NAME: ";
-    setTextColor(7);
-    cin >> playerName;
+	srand(time(NULL)); // seed for random number generation 
+	string playerName;
+	setTextColor(10);
+	cout << "ENTER YOUR NAME: ";
+	setTextColor(7);
+	cin >> playerName;
 
-    do {
-        int dfc = SetDifficultyLevel();
-    
-        GameInit();
-        while (!isGameOver) {
-          
-            pre_snakeTail = snake.getTail();
-            UpdateGame();
-            if (isGameOver) break;
-            GameRender(playerName);
-            UserInput();
-          
-            // creating a delay for according to the chosen
-            // difficulty
-            if (snake.getDirection() == DirectionUp || snake.getDirection() == DirectionDown)
-                Sleep(dfc * 1.5);
-            else
-                Sleep(dfc);
-        }
-        
-        system("cls");
-        setTextColor(10);
-        cout << "Game Over!" << playerName << "'s final score: " << playerScore << endl;
-        setTextColor(7);
+	do {
+		int dfc = SetDifficultyLevel();
 
-        // Hiển thị menu lựa chọn
-        char choice;
-        setTextColor(14);
-        cout << "\nDo you want to play again? (Y/N): ";
-        setTextColor(7);
-        cin >> choice;
-        
-        if (choice == 'N' || choice == 'n')
-        {
-            isGameOver = true; // Đặt trạng thái game kết thúc nếu người chơi chọn thoát
-        }
-        else
-        {
-            isGameOver = false;
-            playerScore = 0;
-            snake = Snake(width / 2, height / 2);
-            food = Food(rand() % width, rand() % height);
-        }
-    } while (!isGameOver); // nếu không kết thúc thì tiếp tục chơi lại 
-    return 0;
+		GameInit();
+		while (!isGameOver) {
+
+			pre_snakeTail = snake.getTail();
+			UpdateGame();
+			if (isGameOver) break;
+			GameRender(playerName);
+			UserInput();
+
+			// creating a delay for according to the chosen
+			// difficulty
+			if (snake.getDirection() == DirectionUp || snake.getDirection() == DirectionDown)
+				Sleep(dfc * 1.5);
+			else
+				Sleep(dfc);
+		}
+
+		system("cls");
+		setTextColor(10);
+		cout << "Game Over!" << playerName << "'s final score: " << playerScore << endl;
+		setTextColor(7);
+
+		// Hiển thị menu lựa chọn
+		char choice;
+		setTextColor(14);
+		cout << "\nDo you want to play again? (Y/N): ";
+		setTextColor(7);
+		cin >> choice;
+
+		if (choice == 'N' || choice == 'n')
+		{
+			isGameOver = true; // Đặt trạng thái game kết thúc nếu người chơi chọn thoát
+		}
+		else
+		{
+			isGameOver = false;
+			playerScore = 0;
+			snake = Snake(width / 2, height / 2);
+			food = Food(rand() % width, rand() % height);
+		}
+	} while (!isGameOver); // nếu không kết thúc thì tiếp tục chơi lại 
+	return 0;
 }
