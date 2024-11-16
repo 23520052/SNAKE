@@ -69,7 +69,7 @@ void generateFood()
 		if (snake.getHead() == food.getFood()) {
 			continue;  // If it overlaps, generate new food
 		}
-
+		
 		check = true;  // Assume the position is valid
 		for (int i = 0; i < snakeTailLen; ++i) {
 			if (snake.getBody()[i] == food.getFood()) {
@@ -112,10 +112,10 @@ void GameInit()
 		}
 
 	snake = Snake(width / 2, height / 2);
+	snakeTailLen = snake.getBody().size(); // Độ dài đuôi ban đầu của rắn 
 	isGameOver = false;
 	generateFood();
 	playerScore = 0;
-	snakeTailLen = snake.getBody().size(); // Độ dài đuôi ban đầu của rắn 
 }
 
 void setTextColor(int color) // màu chữ 
@@ -289,9 +289,6 @@ int main()
 		else
 		{
 			isGameOver = false;
-			playerScore = 0;
-			snake = Snake(width / 2, height / 2);
-			generateFood();
 		}
 	} while (!isGameOver); // nếu không kết thúc thì tiếp tục chơi lại 
 	return 0;
